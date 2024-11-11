@@ -1,20 +1,22 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AuthPages from "./pages/login";
-import AdminDashboard from "./pages/admin-view";
+import LoginForm from "./pages/login";
+//import AdminDashboard from "./pages/admin-view";
 import ExamInterface from "./pages/exam-view";
 import Register from "./pages/LoginEstudent";
 import { AuthProvider } from "./pages/auth/AuthContext";
-import ProtectedRoute from "./pages/auth/ProtectedRoute"; // Importa el ProtectedRoute (lo crearemos en el siguiente paso)
+import AdminDashboard from "./pages/AdminDashboard";
+import Home from "./pages/home";
+// import ProtectedRoute from "./pages/auth/ProtectedRoute"; // Importa el ProtectedRoute (lo crearemos en el siguiente paso)
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<AuthPages />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<Register />} />
-
-          <Route path="/home" element={ <AdminDashboard /> } />
+          <Route path="/home" element={<AdminDashboard />} />
           <Route path="/exam" element={<ExamInterface />} />
         </Routes>
       </BrowserRouter>

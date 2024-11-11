@@ -1,143 +1,197 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
+// Importamos la función loginUser
+import { loginUser } from "../services/auth";
 
-export default function Example() {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const logInUser = () => {
-    if (email.length === 0) {
-      alert("Email en Blanco");
-    } else if (password.length === 0) {
-      alert("Contraseña en Blanco");
-    } else {
-      axios
-        .post("http://localhost:5000/login", {
-          email: email,
-          password: password,
-        })
-        .then(function (response) {
-          console.log(response);
-          navigate("/home", { state: { message: "Inicio de sesión exitoso" } });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-        })
-        .catch(function (error) {
-          console.log(error, "error");
-          if (error.response.status === 401) {
-            alert("Email o Contraseña incorrectos");
-          }
-        });
+    if (!email || !password || !userType) {
+      setError("Por favor, complete todos los campos");
+      return;
+    }
+
+    try {
+      // Llamamos a la función loginUser con las credenciales
+      await loginUser({
+        correo: email,
+        password: password,
+        tipo_usuario: userType,
+      });
+
+      // Redirigimos al usuario según su tipo
+      if (userType === "estudiante") {
+        navigate("/exam");
+      } else {
+        navigate("/home");
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Error al iniciar sesión"
+      );
     }
   };
 
-  const register = () => {
-    navigate("/register")
-  }
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Here you would typically make an API call to validate the credentials
-    // For this example, we'll just simulate a successful login
-    console.log("Login attempt with:", { email, password });
-
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Redirect to home page
-    //navigate("/home");
-  };
-
   return (
-    <div className="flex min-h-screen flex-col justify-center items-center bg-gray-100   ">
-      <div className="w-screen">
-        <img
-          alt="Your Company"
-          src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-          className="mx-auto h-10 w-auto"
-        />
-        <h2 className="mt-10 text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
-          Iniciar Sesión
-        </h2>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-        <form onSubmit={handleSubmit} method="POST" className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Correo Electrónico
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md bg-white border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium leading-6 text-gray-900"
+    <div className="min-h-screen w-screen flex items-center justify-center  bg-gradient-to-br from-blue-600 to-purple-600 p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="w-full">
+          <CardHeader className="space-y-1 text-center">
+            <div className="flex justify-center mb-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                }}
+                className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center"
               >
-                Contraseña
-              </label>
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
-                  Olvidaste tu contraseña?
-                </a>
-              </div>
+                <User className="w-8 h-8 text-white" />
+              </motion.div>
             </div>
-            <div className="mt-2">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md bg-white border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              onClick={logInUser}
-            >
+            <CardTitle className="text-2xl font-bold ">
               Iniciar Sesión
-            </button>
-          </div>
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              onClick={register}
+            </CardTitle>
+            <CardDescription>
+              Ingrese sus credenciales para acceder
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {error && (
+                <div className="p-3 text-sm text-red-500 bg-red-100 border border-red-200 rounded-md">
+                  {error}
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Correo Electrónico
+                </Label>
+                <div className="relative">
+                  <Mail
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    size={18}
+                  />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="correo@ejemplo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 w-full"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Contraseña
+                </Label>
+                <div className="relative">
+                  <Lock
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    size={18}
+                  />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 pr-10 w-full"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 flex items-center justify-center p-1 bg-white"
+                    aria-label={
+                      showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5 text-gray-500" /> //Click en ojo  tapado
+                    ) : (
+                      <Eye className="w-5 h-5 text-gray-500" /> //Click en ojo normal
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="userType" className="text-sm font-medium">
+                  Tipo de Usuario
+                </Label>
+                <Select onValueChange={setUserType} value={userType}>
+                  <SelectTrigger id="userType" className="w-full">
+                    <SelectValue placeholder="Selecciona el tipo de usuario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="estudiante">Estudiante</SelectItem>
+                    <SelectItem value="profesor">Profesor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="submit" className="w-full bg-blue-900">
+                Iniciar Sesión
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+            <Button
+              variant="outline"
+              className="w-full sm:w-1/2"
+              onClick={() => navigate("/register")}
             >
               Registrarse
-            </button>
-          </div>
-        </form>
-      </div>
+            </Button>
+            <Button
+              variant="link"
+              className="w-full sm:w-1/2 bg-white text-black"
+              onClick={() => navigate("/forgot-password")}
+            >
+              ¿Olvidaste tu contraseña?
+            </Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 }
